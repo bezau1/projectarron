@@ -1,1 +1,234 @@
-<!-- if you are reading this i dont feel sorry for you... -->
+<!-- if you are reading this i dont feel sorry for you... arin... -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>click it</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --pulse: #ff2d55;
+      --glow: rgba(255, 45, 85, 0.6);
+    }
+
+    body {
+      background: var(--bg);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: 'Space Mono', monospace;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* animated noise grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+      opacity: 0.18;
+      pointer-events: none;
+      animation: grain 0.4s steps(1) infinite;
+      z-index: 10;
+    }
+
+    @keyframes grain {
+      0%  { transform: translate(0,0); }
+      10% { transform: translate(-3%,-5%); }
+      20% { transform: translate(5%,3%); }
+      30% { transform: translate(-2%,7%); }
+      40% { transform: translate(6%,-2%); }
+      50% { transform: translate(-4%,4%); }
+      60% { transform: translate(3%,-6%); }
+      70% { transform: translate(-5%,2%); }
+      80% { transform: translate(4%,5%); }
+      90% { transform: translate(-3%,-4%); }
+    }
+
+    .label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      letter-spacing: 0.35em;
+      color: #555;
+      margin-bottom: 2.5rem;
+      text-transform: uppercase;
+      animation: fadein 1.2s ease forwards;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-wrap {
+      position: relative;
+    }
+
+    /* pulsing rings */
+    .ring {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 2px solid var(--pulse);
+      opacity: 0;
+      animation: ring-pulse 2.4s ease-out infinite;
+    }
+    .ring:nth-child(2) { animation-delay: 0.8s; }
+    .ring:nth-child(3) { animation-delay: 1.6s; }
+
+    @keyframes ring-pulse {
+      0%   { transform: scale(0.8); opacity: 0.7; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    button {
+      position: relative;
+      z-index: 1;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      border: none;
+      background: var(--pulse);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      box-shadow:
+        0 0 0 4px #1a1a1a,
+        0 0 0 6px var(--pulse),
+        0 0 40px var(--glow),
+        0 0 80px rgba(255,45,85,0.2);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      animation: fadein 1.2s 0.3s ease both;
+    }
+
+    button:hover {
+      transform: scale(1.07);
+      box-shadow:
+        0 0 0 4px #1a1a1a,
+        0 0 0 6px var(--pulse),
+        0 0 60px var(--glow),
+        0 0 120px rgba(255,45,85,0.35);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .hint {
+      margin-top: 2.8rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #333;
+      text-transform: uppercase;
+      animation: fadein 1.2s 0.7s ease both;
+    }
+
+    /* fullscreen video overlay */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    #overlay.active { display: flex; }
+
+    #overlay video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* close hint */
+    #close-hint {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.4rem;
+      z-index: 1000;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      pointer-events: none;
+      display: none;
+    }
+    #close-hint.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <span class="label">Warning: Fun Inside</span>
+
+  <div class="btn-wrap">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <button id="clickBtn">CLICK<br>IT</button>
+  </div>
+
+  <span class="hint">You know you want to</span>
+
+  <div id="overlay">
+    <video id="vid" src="funvid:).mp4" playsinline></video>
+  </div>
+  <div id="close-hint">ESC / tap to close</div>
+
+  <script>
+    const btn     = document.getElementById('clickBtn');
+    const overlay = document.getElementById('overlay');
+    const vid     = document.getElementById('vid');
+    const hint    = document.getElementById('close-hint');
+
+    function openVideo() {
+      overlay.classList.add('active');
+      hint.classList.add('active');
+      vid.currentTime = 0;
+
+      // fuck this
+      // this is pain but worth it
+      const el = overlay;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+      if (req) {
+        req.call(el).catch(() => {});
+      }
+
+      vid.play().catch(() => {});
+    }
+
+    function closeVideo() {
+      overlay.classList.remove('active');
+      hint.classList.remove('active');
+      vid.pause();
+      vid.currentTime = 0;
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    btn.addEventListener('click', openVideo);
+    overlay.addEventListener('click', closeVideo);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideo(); });
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) closeVideo();
+    });
+    vid.addEventListener('ended', closeVideo);
+  </script>
+</body>
+</html>
